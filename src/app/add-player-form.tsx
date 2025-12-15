@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { toast } from "sonner";
 import { useState } from "react";
+import { revalidateLeaderboard } from "./actions";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -52,6 +53,7 @@ export function AddPlayerForm({ onSuccess, className }: AddPlayerFormProps) {
       }
 
       toast.success(`Player "${data.name}" added successfully!`);
+      await revalidateLeaderboard();
       form.reset();
       if (onSuccess) {
         onSuccess();

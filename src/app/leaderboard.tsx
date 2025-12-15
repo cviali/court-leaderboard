@@ -5,89 +5,61 @@ import { useEffect, useState } from "react";
 import { Trophy, Medal, Calendar, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useRouter } from "next/navigation";
 
-export function Leaderboard() {
-  const [players, setPlayers] = useState<Player[]>([]);
-  const [courts, setCourts] = useState<Court[]>([]);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+interface LeaderboardProps {
+  initialPlayers: Player[];
+  initialCourts: Court[];
+}
+
+export function Leaderboard({ initialPlayers, initialCourts }: LeaderboardProps) {
+  const router = useRouter();
+  const [players, setPlayers] = useState<Player[]>(initialPlayers);
+  const [courts, setCourts] = useState<Court[]>(initialCourts);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(new Date());
 
   useEffect(() => {
-    const fetchPlayers = () => {
-      fetch("/api/players")
-        .then((res) => res.json())
-        .then((data) => {
-          setPlayers(data as Player[]);
-          setLastUpdated(new Date());
-          setIsLoading(false);
-        });
-    };
+    setPlayers(initialPlayers);
+    setCourts(initialCourts);
+    setLastUpdated(new Date());
+  }, [initialPlayers, initialCourts]);
 
-    fetch("/api/courts")
-      .then((res) => res.json())
-      .then((data) => setCourts(data as Court[]));
-
-    fetchPlayers();
-    const interval = setInterval(fetchPlayers, 5000); // Poll every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      router.refresh();
+    }, 10000); // Refresh every 10 seconds (hits server cache)
 
     return () => clearInterval(interval);
-  }, []);
+  }, [router]);
 
   return (
     <div className="w-full max-w-3xl mx-auto space-y-4">
-      <div className="flex flex-col items-center mb-8">
+      <div className="flex flex-col items-center mb-4">
         <Image
           src="/logo.png"
           alt="Court Leaderboard Logo"
           width={120}
           height={120}
           className="mb-4"
+          style={{ width: "120px", height: "auto" }}
           priority
         />
         {lastUpdated && (
-          <span className="text-xs text-muted-foreground mb-2">
+          <span className="text-xs text-muted-foreground">
             Last updated: {lastUpdated.toLocaleTimeString()}
           </span>
         )}
-        <h1 className="text-3xl font-bold text-center text-[#32574C]">
-          Court Leaderboard
-        </h1>
       </div>
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 bg-[#32574C] text-white rounded-xl shadow-md">
         <div className="font-bold text-sm tracking-widest uppercase w-12 text-center">Rank</div>
-        <div className="font-bold text-sm tracking-widest uppercase flex-1 px-6">Athlete</div>
+        <div className="font-bold text-sm tracking-widest uppercase flex-1 px-6">Player</div>
         <div className="font-bold text-sm tracking-widest uppercase text-right w-24">Points</div>
       </div>
 
       {/* List */}
       <div className="flex flex-col gap-3">
-        {isLoading ? (
-          Array.from({ length: 5 }).map((_, i) => (
-            <div
-              key={i}
-              className="relative flex items-center justify-between p-4 rounded-xl border border-transparent bg-white"
-            >
-              <div className="flex items-center justify-center w-12 shrink-0">
-                <Skeleton className="w-8 h-8 rounded-full" />
-              </div>
-              <div className="flex-1 px-6 min-w-0">
-                <div className="flex flex-col gap-2">
-                  <Skeleton className="h-6 w-32" />
-                  <Skeleton className="h-4 w-24" />
-                </div>
-              </div>
-              <div className="flex items-center justify-end w-24">
-                <div className="flex flex-col items-end gap-1">
-                  <Skeleton className="h-8 w-16" />
-                  <Skeleton className="h-3 w-8" />
-                </div>
-              </div>
-            </div>
-          ))
-        ) : (
-          players.map((player, index) => {
+        {players.map((player, index) => {
           const rank = index + 1;
           const isTop3 = rank <= 3;
           
@@ -168,7 +140,7 @@ export function Leaderboard() {
               </div>
             </div>
           );
-        }))}
+        })}
       </div>
     </div>
   );

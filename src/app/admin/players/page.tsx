@@ -9,6 +9,12 @@ import { useState } from "react";
 
 export default function AdminPlayersPage() {
   const [open, setOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const handleSuccess = () => {
+    setOpen(false);
+    setRefreshKey((prev) => prev + 1);
+  };
 
   return (
     <div className="space-y-4">
@@ -27,10 +33,10 @@ export default function AdminPlayersPage() {
             </Button>
           }
         >
-          <AddPlayerForm onSuccess={() => setOpen(false)} />
+          <AddPlayerForm onSuccess={handleSuccess} />
         </ResponsiveSheet>
       </div>
-      <PlayerList />
+      <PlayerList key={refreshKey} />
     </div>
   );
 }

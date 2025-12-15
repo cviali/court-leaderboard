@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { Player, Court } from "@/lib/types";
 import { sports } from "@/lib/constants";
 import { toast } from "sonner";
+import { revalidateLeaderboard } from "./actions";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -89,6 +90,7 @@ export function AddMatchForm({ onSuccess, className }: AddMatchFormProps) {
       }
 
       toast.success("Match recorded successfully!");
+      await revalidateLeaderboard();
       form.reset();
       if (onSuccess) {
         onSuccess();

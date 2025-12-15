@@ -1,0 +1,14 @@
+{
+	"$schema": "https://json.schemastore.org/wrangler.json",
+	"name": "court-leaderboard-api",
+	"main": "src/index.ts",
+	"compatibility_date": "2025-12-01",
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "court-leaderboard",
+			"database_id": "b71c8d2c-b93b-4c62-99e9-6c97aa55950b",
+			"migrations_dir": "drizzle"
+		}
+	]
+}

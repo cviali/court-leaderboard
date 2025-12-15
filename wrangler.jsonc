@@ -19,6 +19,13 @@
 		"binding": "ASSETS",
 		"directory": ".open-next/assets"
 	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "court-leaderboard",
+			"database_id": "b71c8d2c-b93b-4c62-99e9-6c97aa55950b"
+		}
+	],
 	"images": {
 		// Enable image optimization
 		// see https://opennext.js.org/cloudflare/howtos/image

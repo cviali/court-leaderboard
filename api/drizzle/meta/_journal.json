@@ -1,0 +1,13 @@
+{
+  "version": "6",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1765834401233,
+      "tag": "0000_bitter_gamora",
+      "breakpoints": true
+    }
+  ]
+}

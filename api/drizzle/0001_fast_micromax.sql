@@ -1,0 +1,1 @@
+ALTER TABLE `players` ADD `last_match_at` integer;

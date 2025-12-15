@@ -29,6 +29,20 @@ This project leverages the Cloudflare ecosystem for high performance and scalabi
 - **UI Components**: shadcn/ui
 - **Icons**: Lucide React
 
+## Project Structure
+
+The project is organized into two main parts: the Next.js frontend and the Cloudflare Worker API.
+
+- **`src/`**: Contains the Next.js frontend application.
+  - **`app/`**: App Router pages, layouts, and global styles.
+  - **`components/`**: Reusable UI components (including shadcn/ui).
+  - **`lib/`**: Utility functions, types, and shared logic.
+  - **`server/`**: Server-side logic and database interactions for the frontend.
+- **`api/`**: Contains the standalone Cloudflare Worker API code.
+  - Handles direct database operations and exposes endpoints used by the frontend.
+- **`drizzle/`**: Database schema migrations.
+- **`public/`**: Static assets like images and fonts.
+
 ## Getting Started
 
 ### Prerequisites

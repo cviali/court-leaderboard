@@ -1,47 +1,67 @@
-# OpenNext Starter
+# Court Leaderboard
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+A real-time leaderboard application built with Next.js 15 and deployed on Cloudflare Workers using OpenNext. This application tracks player rankings, match history, and court usage statistics.
+
+## Overview
+
+The Court Leaderboard allows users to:
+- View live player rankings based on match performance.
+- Track match history and court utilization.
+- Administer players and matches via a secured admin interface.
+
+The application is optimized for performance using Server-Side Rendering (SSR) and Incremental Static Regeneration (ISR) to minimize database load while keeping data fresh.
+
+## Architecture & Cloudflare Integration
+
+This project leverages the Cloudflare ecosystem for high performance and scalability:
+
+- **Cloudflare Workers**: The entire Next.js application runs on the Edge using [OpenNext](https://opennext.js.org/), providing low-latency SSR.
+- **Cloudflare D1**: A serverless SQLite database stores all application data (players, courts, matches).
+- **Cloudflare Images**: Used for optimizing and serving image assets.
+- **Cloudflare Assets**: Efficiently serves static assets (CSS, JS, public files).
+
+## Tech Stack
+
+- **Framework**: Next.js 15 (App Router)
+- **Runtime**: Cloudflare Workers (via OpenNext)
+- **Database**: Drizzle ORM with Cloudflare D1
+- **Styling**: Tailwind CSS
+- **UI Components**: shadcn/ui
+- **Icons**: Lucide React
 
 ## Getting Started
 
-Read the documentation at https://opennext.js.org/cloudflare.
+### Prerequisites
 
-## Develop
+- Node.js
+- Cloudflare Wrangler CLI
 
-Run the Next.js development server:
+### Development
 
-```bash
-npm run dev
-# or similar package manager command
-```
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Run the development server:
+   ```bash
+   npm run dev
+   ```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Deployment
 
-## Preview
-
-Preview the application locally on the Cloudflare runtime:
-
-```bash
-npm run preview
-# or similar package manager command
-```
-
-## Deploy
-
-Deploy the application to Cloudflare:
+Deploy to Cloudflare Workers:
 
 ```bash
 npm run deploy
-# or similar package manager command
 ```
 
-## Learn More
+This command builds the Next.js application using OpenNext and deploys it to your Cloudflare account.
 
-To learn more about Next.js, take a look at the following resources:
+## Database Management
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The project uses Drizzle ORM to manage the D1 database.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Generate Migrations**: `npm run db:generate`
+- **Apply Migrations**: `npm run db:migrate`
+- **Open Studio**: `npm run db:studio`

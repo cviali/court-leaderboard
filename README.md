@@ -79,3 +79,10 @@ The project uses Drizzle ORM to manage the D1 database.
 - **Generate Migrations**: `npm run db:generate`
 - **Apply Migrations**: `npm run db:migrate`
 - **Open Studio**: `npm run db:studio`
+
+## Security (Planned)
+
+To secure the administrative interface (`/admin`), I plan to implement **Cloudflare Access** (Zero Trust). This will:
+- Restrict access to the `/admin` routes to authenticated users only.
+- Offload authentication logic to Cloudflare's edge network, requiring no code changes in the application.
+- Support various identity providers and access policies (e.g., email OTP, specific domains).

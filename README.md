@@ -1,88 +1,49 @@
 # Court Leaderboard
 
-A real-time leaderboard application built with Next.js 15 and deployed on Cloudflare Workers using OpenNext. This application tracks player rankings, match history, and court usage statistics.
-
-## Overview
-
-The Court Leaderboard allows users to:
-- View live player rankings based on match performance.
-- Track match history and court utilization.
-- Administer players and matches via a secured admin interface.
-
-The application is optimized for performance using Server-Side Rendering (SSR) and Incremental Static Regeneration (ISR) to minimize database load while keeping data fresh.
-
-## Architecture & Cloudflare Integration
-
-This project leverages the Cloudflare ecosystem for high performance and scalability:
-
-- **Cloudflare Workers**: The entire Next.js application runs on the Edge using [OpenNext](https://opennext.js.org/), providing low-latency SSR.
-- **Cloudflare D1**: A serverless SQLite database stores all application data (players, courts, matches).
-- **Cloudflare Images**: Used for optimizing and serving image assets.
-- **Cloudflare Assets**: Efficiently serves static assets (CSS, JS, public files).
+A real-time leaderboard application for tracking player rankings and match history, built for the Edge.
 
 ## Tech Stack
 
-- **Framework**: Next.js 15 (App Router)
-- **Runtime**: Cloudflare Workers (via OpenNext)
-- **Database**: Drizzle ORM with Cloudflare D1
-- **Styling**: Tailwind CSS
-- **UI Components**: shadcn/ui
-- **Icons**: Lucide React
+*   **Framework:** [Next.js 15](https://nextjs.org/) (App Router)
+*   **Language:** TypeScript
+*   **Styling:** [Tailwind CSS](https://tailwindcss.com/) & [shadcn/ui](https://ui.shadcn.com/)
+*   **Animation:** [Framer Motion](https://www.framer.com/motion/)
+*   **Backend:** Cloudflare Workers
+*   **Database:** Cloudflare D1 (SQLite) + [Drizzle ORM](https://orm.drizzle.team/)
+*   **Storage:** Cloudflare R2 (Avatars)
+*   **Deployment:** Cloudflare Workers (via [OpenNext](https://opennext.js.org/))
 
-## Project Structure
+## Features
 
-The project is organized into two main parts: the Next.js frontend and the Cloudflare Worker API.
-
-- **`src/`**: Contains the Next.js frontend application.
-  - **`app/`**: App Router pages, layouts, and global styles.
-  - **`components/`**: Reusable UI components (including shadcn/ui).
-  - **`lib/`**: Utility functions, types, and shared logic.
-  - **`server/`**: Server-side logic and database interactions for the frontend.
-- **`api/`**: Contains the standalone Cloudflare Worker API code.
-  - Handles direct database operations and exposes endpoints used by the frontend.
-- **`drizzle/`**: Database schema migrations.
-- **`public/`**: Static assets like images and fonts.
+*   **Live Leaderboard:** Real-time ranking updates with smooth animations.
+*   **Admin Dashboard:** Mobile-friendly interface to manage players and record matches.
+*   **Match Tracking:** Record match results for Padel, Tennis, and Badminton.
+*   **Edge Performance:** Fully deployed on Cloudflare's global network for low latency.
 
 ## Getting Started
 
-### Prerequisites
+1.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
 
-- Node.js
-- Cloudflare Wrangler CLI
+2.  **Run development server:**
+    ```bash
+    npm run dev
+    ```
 
-### Development
+3.  **Deploy to Cloudflare:**
+    ```bash
+    npm run deploy      # Frontend
+    npm run deploy:api  # Backend API
+    ```
 
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
+## Project Structure
 
-2. Run the development server:
-   ```bash
-   npm run dev
-   ```
+*   `src/` - Next.js frontend application.
+*   `api/` - Cloudflare Worker API & Database schema.
+*   `drizzle/` - Database migrations.
 
-### Deployment
+## Security
 
-Deploy to Cloudflare Workers:
-
-```bash
-npm run deploy
-```
-
-This command builds the Next.js application using OpenNext and deploys it to your Cloudflare account.
-
-## Database Management
-
-The project uses Drizzle ORM to manage the D1 database.
-
-- **Generate Migrations**: `npm run db:generate`
-- **Apply Migrations**: `npm run db:migrate`
-- **Open Studio**: `npm run db:studio`
-
-## Security (Planned)
-
-To secure the administrative interface (`/admin`), I plan to implement **Cloudflare Access** (Zero Trust). This will:
-- Restrict access to the `/admin` routes to authenticated users only.
-- Offload authentication logic to Cloudflare's edge network, requiring no code changes in the application.
-- Support various identity providers and access policies (e.g., email OTP, specific domains).
+The `/admin` routes are designed to be protected by **Cloudflare Access** (Zero Trust), offloading authentication to the edge.

@@ -3,15 +3,18 @@ import * as schema from "./schema";
 import { players, matches, courts } from "./schema";
 import { eq, sql, desc } from "drizzle-orm";
 import { Router, IRequest } from "itty-router";
-import type { D1Database } from "@cloudflare/workers-types";
+import type { D1Database, R2Bucket } from "@cloudflare/workers-types";
 
 export interface Env {
   DB: D1Database;
+  ASSETS: R2Bucket;
 }
 
 interface Player {
   id: number;
   name: string;
+  avatarUrl: string | null;
+  instagramHandle: string | null;
   points: number;
   lastMatchAt: Date | null;
   lastCourtId: number | null;
@@ -50,10 +53,23 @@ router.options("*", (request: IRequest) => {
 router.get("/players", withDB, async (request: IRequest, env: Env) => {
   const req = request as CustomRequest;
   const db = req.db;
-  const players: Player[] = await db.query.players.findMany({
+  const url = new URL(request.url);
+  const page = parseInt(url.searchParams.get("page") || "1");
+  const limit = parseInt(url.searchParams.get("limit") || "1000"); // Default high limit for backward compatibility
+  const offset = (page - 1) * limit;
+
+  const playersList = await db.query.players.findMany({
     orderBy: (players: any) => [desc(players.points)],
+    limit: limit,
+    offset: offset,
   });
-  return new Response(JSON.stringify(players), {
+
+  // If pagination params are present, return metadata (optional, but good practice)
+  // For now, to maintain compatibility with existing frontend which expects an array,
+  // we will just return the array. The frontend will need to be updated to handle
+  // the "infinite scroll" logic by appending data.
+  
+  return new Response(JSON.stringify(playersList), {
     headers: {
       ...req.corsHeaders,
       "Content-Type": "application/json",
@@ -64,14 +80,32 @@ router.get("/players", withDB, async (request: IRequest, env: Env) => {
 router.post("/players", withDB, async (request: IRequest, env: Env) => {
   const req = request as CustomRequest;
   const db = req.db;
-  const { name } = (await request.json()) as { name: string };
+  const { name, avatarUrl, instagramHandle } = (await request.json()) as { name: string; avatarUrl?: string; instagramHandle?: string };
   if (!name) {
     return new Response("Name is required", {
       status: 400,
       headers: req.corsHeaders,
     });
   }
-  const newPlayer = await db.insert(players).values({ name }).returning();
+
+  let finalAvatarUrl = avatarUrl;
+
+  // If avatarUrl is a base64 string, upload it to R2
+  if (avatarUrl && avatarUrl.startsWith("data:image")) {
+    const base64Data = avatarUrl.split(",")[1];
+    const binaryData = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
+    const fileName = `avatars/${crypto.randomUUID()}.jpg`;
+    
+    await env.ASSETS.put(fileName, binaryData, {
+      httpMetadata: { contentType: "image/jpeg" },
+    });
+
+    // Construct the public URL (assuming you have a custom domain or use the worker as a proxy)
+    // For now, we'll store the R2 key and serve it via a new endpoint
+    finalAvatarUrl = `/api/assets/${fileName}`;
+  }
+
+  const newPlayer = await db.insert(players).values({ name, avatarUrl: finalAvatarUrl, instagramHandle }).returning();
   return new Response(JSON.stringify(newPlayer), {
     headers: {
       ...req.corsHeaders,
@@ -85,21 +119,42 @@ router.put("/players/:id", withDB, async (request: IRequest, env: Env) => {
   const req = request as CustomRequest;
   const db = req.db;
   const id = parseInt(request.params.id);
-  const { name, points } = (await request.json()) as {
+  const { name, points, avatarUrl, instagramHandle } = (await request.json()) as {
     name?: string;
     points?: number;
+    avatarUrl?: string;
+    instagramHandle?: string;
   };
 
-  if (!name && points === undefined) {
-    return new Response("Name or points are required", {
+  if (!name && points === undefined && !avatarUrl && instagramHandle === undefined) {
+    return new Response("Name, points, avatarUrl, or instagramHandle are required", {
       status: 400,
       headers: req.corsHeaders,
     });
   }
 
-  const updateData: { name?: string; points?: number } = {};
+  const updateData: { name?: string; points?: number; avatarUrl?: string | null; instagramHandle?: string | null } = {};
   if (name) updateData.name = name;
   if (points !== undefined) updateData.points = points;
+  if (instagramHandle !== undefined) updateData.instagramHandle = instagramHandle;
+  
+  if (avatarUrl !== undefined) {
+    if (avatarUrl && avatarUrl.startsWith("data:image")) {
+      const base64Data = avatarUrl.split(",")[1];
+      const binaryData = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
+      const fileName = `avatars/${crypto.randomUUID()}.jpg`;
+      
+      await env.ASSETS.put(fileName, binaryData, {
+        httpMetadata: { contentType: "image/jpeg" },
+      });
+
+      updateData.avatarUrl = `/api/assets/${fileName}`;
+    } else if (avatarUrl === "" || avatarUrl === null) {
+      updateData.avatarUrl = null;
+    } else {
+      updateData.avatarUrl = avatarUrl;
+    }
+  }
 
   const updatedPlayer = await db
     .update(players)
@@ -130,10 +185,18 @@ router.get("/courts", withDB, async (request: IRequest, env: Env) => {
 router.get("/matches", withDB, async (request: IRequest, env: Env) => {
   const req = request as CustomRequest;
   const db = req.db;
+  const url = new URL(request.url);
+  const page = parseInt(url.searchParams.get("page") || "1");
+  const limit = parseInt(url.searchParams.get("limit") || "1000");
+  const offset = (page - 1) * limit;
+
   const allMatches = await db
     .select()
     .from(matches)
-    .orderBy(desc(matches.createdAt));
+    .orderBy(desc(matches.createdAt))
+    .limit(limit)
+    .offset(offset);
+
   return new Response(JSON.stringify(allMatches), {
     headers: {
       ...req.corsHeaders,
@@ -177,7 +240,7 @@ router.post("/matches", withDB, async (request: IRequest, env: Env) => {
     .set({ lastMatchAt: new Date(), lastCourtId: courtId })
     .where(eq(players.id, loserId));
 
-  return new Response(JSON.stringify({ message: "Match recorded" }), {
+    return new Response(JSON.stringify({ message: "Match recorded" }), {
     headers: {
       ...req.corsHeaders,
       "Content-Type": "application/json",
@@ -186,15 +249,23 @@ router.post("/matches", withDB, async (request: IRequest, env: Env) => {
   });
 });
 
-// 404 for everything else
-router.all("*", (request: IRequest) => {
-  return new Response("Not Found", {
-    status: 404,
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
-    },
+// Serve assets from R2
+router.get("/assets/*", async (request: IRequest, env: Env) => {
+  const url = new URL(request.url);
+  const key = url.pathname.replace("/assets/", "");
+  
+  const object = await env.ASSETS.get(key);
+
+  if (!object) {
+    return new Response("Object Not Found", { status: 404 });
+  }
+
+  const headers = new Headers();
+  object.writeHttpMetadata(headers);
+  headers.set("etag", object.httpEtag);
+
+  return new Response(object.body, {
+    headers,
   });
 });
 

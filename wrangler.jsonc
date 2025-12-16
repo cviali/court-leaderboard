@@ -41,7 +41,14 @@
 	],
 	"observability": {
 		"enabled": true
-	}
+	},
+	"r2_buckets": [
+		{
+			"bucket_name": "court-leaderboard-assets",
+			"binding": "court_leaderboard_assets",
+			"remote": true
+		}
+	]
 	/**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement

@@ -63,6 +63,12 @@ export function AddMatchForm({ onSuccess, className }: AddMatchFormProps) {
     },
   });
 
+  const selectedSport = form.watch("sport");
+
+  useEffect(() => {
+    form.setValue("courtId", "");
+  }, [selectedSport, form]);
+
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     if (data.winnerId === data.loserId) {
       form.setError("loserId", {
@@ -168,7 +174,7 @@ export function AddMatchForm({ onSuccess, className }: AddMatchFormProps) {
                 <SelectContent>
                   {sports.map((sport) => (
                     <SelectItem key={sport} value={sport}>
-                      {sport}
+                      {sport.charAt(0).toUpperCase() + sport.slice(1)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -190,9 +196,11 @@ export function AddMatchForm({ onSuccess, className }: AddMatchFormProps) {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {courts.map((court) => (
+                  {courts
+                    .filter((court) => court.type === selectedSport)
+                    .map((court) => (
                     <SelectItem key={court.id} value={court.id.toString()}>
-                      {court.name} ({court.type})
+                      {court.name}
                     </SelectItem>
                   ))}
                 </SelectContent>

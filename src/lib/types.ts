@@ -1,6 +1,8 @@
 export interface Player {
   id: number;
   name: string;
+  avatarUrl?: string | null;
+  instagramHandle?: string | null;
   points: number;
   lastMatchAt: Date | null;
   lastCourtId?: number | null;

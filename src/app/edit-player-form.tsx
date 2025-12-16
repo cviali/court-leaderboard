@@ -15,6 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Player } from "@/lib/types";
+import { ImageUpload } from "@/components/image-upload";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -23,6 +24,8 @@ const formSchema = z.object({
   points: z.coerce.number().min(0, {
     message: "Points must be a positive number.",
   }),
+  avatarUrl: z.string().optional(),
+  instagramHandle: z.string().optional(),
 });
 
 interface EditPlayerFormProps {
@@ -36,6 +39,8 @@ export function EditPlayerForm({ player, onSuccess }: EditPlayerFormProps) {
     defaultValues: {
       name: player.name,
       points: player.points,
+      avatarUrl: player.avatarUrl || "",
+      instagramHandle: player.instagramHandle || "",
     },
   });
 
@@ -69,12 +74,38 @@ export function EditPlayerForm({ player, onSuccess }: EditPlayerFormProps) {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <FormField
           control={form.control}
+          name="avatarUrl"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Avatar</FormLabel>
+              <FormControl>
+                <ImageUpload value={field.value} onChange={field.onChange} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
           name="name"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Name</FormLabel>
               <FormControl>
                 <Input placeholder="Player Name" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="instagramHandle"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Instagram Handle</FormLabel>
+              <FormControl>
+                <Input placeholder="@username" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

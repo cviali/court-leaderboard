@@ -11,6 +11,8 @@ export const courts = sqliteTable("courts", {
 export const players = sqliteTable("players", {
   id: integer("id").primaryKey(),
   name: text("name").notNull(),
+  avatarUrl: text("avatar_url"),
+  instagramHandle: text("instagram_handle"),
   points: integer("points").default(0).notNull(),
   lastMatchAt: integer("last_match_at", { mode: "timestamp" }),
   lastCourtId: integer("last_court_id").references(() => courts.id),

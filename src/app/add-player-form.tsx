@@ -18,10 +18,14 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
+import { ImageUpload } from "@/components/image-upload";
+
 const FormSchema = z.object({
   name: z.string().min(2, {
     message: "Name must be at least 2 characters.",
   }),
+  avatarUrl: z.string().optional(),
+  instagramHandle: z.string().optional(),
 });
 
 interface AddPlayerFormProps {
@@ -36,6 +40,8 @@ export function AddPlayerForm({ onSuccess, className }: AddPlayerFormProps) {
     resolver: zodResolver(FormSchema),
     defaultValues: {
       name: "",
+      avatarUrl: "",
+      instagramHandle: "",
     },
   });
 
@@ -70,12 +76,38 @@ export function AddPlayerForm({ onSuccess, className }: AddPlayerFormProps) {
       <form onSubmit={form.handleSubmit(onSubmit)} className={`space-y-6 ${className}`}>
         <FormField
           control={form.control}
+          name="avatarUrl"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Avatar</FormLabel>
+              <FormControl>
+                <ImageUpload value={field.value} onChange={field.onChange} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
           name="name"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Player Name</FormLabel>
               <FormControl>
                 <Input placeholder="John Doe" {...field} disabled={isLoading} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="instagramHandle"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Instagram Handle</FormLabel>
+              <FormControl>
+                <Input placeholder="@username" {...field} disabled={isLoading} />
               </FormControl>
               <FormMessage />
             </FormItem>

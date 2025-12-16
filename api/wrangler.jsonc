@@ -10,5 +10,11 @@
 			"database_id": "b71c8d2c-b93b-4c62-99e9-6c97aa55950b",
 			"migrations_dir": "drizzle"
 		}
+	],
+	"r2_buckets": [
+		{
+			"binding": "ASSETS",
+			"bucket_name": "court-leaderboard-assets"
+		}
 	]
 }

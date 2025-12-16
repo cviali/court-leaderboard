@@ -16,26 +16,42 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ResponsiveSheet } from "@/components/responsive-sheet";
 import { EditPlayerForm } from "./edit-player-form";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function PlayerList() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [editingPlayer, setEditingPlayer] = useState<Player | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const LIMIT = 20;
 
-  const fetchPlayers = () => {
+  const fetchPlayers = (pageNum: number, reset = pageNum === 1) => {
     setIsLoading(true);
-    fetch("/api/players")
+    fetch(`/api/players?page=${pageNum}&limit=${LIMIT}`)
       .then((res) => res.json())
-      .then((data) => {
-        setPlayers(data as Player[]);
+      .then((resData) => {
+        const data = resData as Player[];
+        if (data.length < LIMIT) {
+          setHasMore(false);
+        }
+        setPlayers((prev) => reset ? data : [...prev, ...data]);
         setIsLoading(false);
       });
   };
 
   useEffect(() => {
-    fetchPlayers();
+    fetchPlayers(1, true);
   }, []);
+
+  const loadMore = () => {
+    if (!isLoading && hasMore) {
+      const nextPage = page + 1;
+      setPage(nextPage);
+      fetchPlayers(nextPage);
+    }
+  };
 
   const columns: ColumnDef<Player>[] = [
     {
@@ -45,6 +61,18 @@ export function PlayerList() {
     {
       accessorKey: "name",
       header: "Name",
+      cell: ({ row }) => {
+        const player = row.original;
+        return (
+          <div className="flex items-center gap-2">
+            <Avatar className="h-8 w-8">
+              <AvatarImage src={player.avatarUrl || undefined} alt={player.name} />
+              <AvatarFallback>{player.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+            </Avatar>
+            <span>{player.name}</span>
+          </div>
+        );
+      },
     },
     {
       accessorKey: "lastMatchAt",
@@ -64,6 +92,14 @@ export function PlayerList() {
     {
       accessorKey: "points",
       header: "Points",
+    },
+    {
+      accessorKey: "instagramHandle",
+      header: "Instagram",
+      cell: ({ row }) => {
+        const handle = row.getValue("instagramHandle") as string | null;
+        return handle ? <span>{handle}</span> : <span className="text-muted-foreground">-</span>;
+      },
     },
     {
       id: "actions",
@@ -97,7 +133,7 @@ export function PlayerList() {
     },
   ];
 
-  if (isLoading) {
+  if (isLoading && players.length === 0) {
     return (
       <div className="space-y-4">
         <div className="rounded-md border p-4">
@@ -113,17 +149,59 @@ export function PlayerList() {
             ))}
           </div>
         </div>
-        <div className="flex items-center justify-end space-x-2">
-          <Skeleton className="h-9 w-20" />
-          <Skeleton className="h-9 w-20" />
-        </div>
       </div>
     );
   }
 
   return (
     <>
-      <DataTable columns={columns} data={players} />
+      {/* Desktop Table View */}
+      <div className="hidden md:block">
+        <DataTable columns={columns} data={players} />
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="md:hidden space-y-4">
+        {players.map((player) => (
+          <div
+            key={player.id}
+            className="bg-white p-4 rounded-lg shadow-sm border flex items-center gap-4 active:scale-[0.98] transition-transform cursor-pointer"
+            onClick={() => {
+              setEditingPlayer(player);
+              setIsEditOpen(true);
+            }}
+          >
+            <Avatar className="h-12 w-12">
+              <AvatarImage src={player.avatarUrl || undefined} alt={player.name} />
+              <AvatarFallback>{player.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold truncate">{player.name}</h3>
+                <span className="font-bold text-primary">{player.points} pts</span>
+              </div>
+              <div className="text-sm text-muted-foreground truncate">
+                {player.instagramHandle || "No Instagram"}
+              </div>
+              <div className="text-xs text-muted-foreground mt-1">
+                Last match: {player.lastMatchAt ? new Date(player.lastMatchAt).toLocaleDateString() : "-"}
+              </div>
+            </div>
+          </div>
+        ))}
+        
+        {hasMore && (
+          <Button 
+            variant="outline" 
+            className="w-full" 
+            onClick={loadMore}
+            disabled={isLoading}
+          >
+            {isLoading ? "Loading..." : "Load More"}
+          </Button>
+        )}
+      </div>
+
       {editingPlayer && (
         <ResponsiveSheet
           open={isEditOpen}
@@ -135,7 +213,9 @@ export function PlayerList() {
             player={editingPlayer}
             onSuccess={() => {
               setIsEditOpen(false);
-              fetchPlayers();
+              setPage(1);
+              setHasMore(true);
+              fetchPlayers(1, true);
             }}
           />
         </ResponsiveSheet>

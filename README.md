@@ -1,49 +1,45 @@
-# Court Leaderboard
+# court leaderboard
 
-A real-time leaderboard application for tracking player rankings and match history, built for the Edge.
+simple leaderboard app to track rankings and matches.
 
-## Tech Stack
+## tech stack
 
-*   **Framework:** [Next.js 15](https://nextjs.org/) (App Router)
-*   **Language:** TypeScript
-*   **Styling:** [Tailwind CSS](https://tailwindcss.com/) & [shadcn/ui](https://ui.shadcn.com/)
-*   **Animation:** [Framer Motion](https://www.framer.com/motion/)
-*   **Backend:** Cloudflare Workers
-*   **Database:** Cloudflare D1 (SQLite) + [Drizzle ORM](https://orm.drizzle.team/)
-*   **Storage:** Cloudflare R2 (Avatars)
-*   **Deployment:** Cloudflare Workers (via [OpenNext](https://opennext.js.org/))
+*   **framework:** [next.js 15](https://nextjs.org/) (app router)
+*   **language:** typescript
+*   **styling:** [tailwind css](https://tailwindcss.com/) & [shadcn/ui](https://ui.shadcn.com/)
+*   **animation:** [framer motion](https://www.framer.com/motion/)
+*   **backend:** cloudflare workers
+*   **database:** cloudflare d1 (sqlite) + [drizzle orm](https://orm.drizzle.team/)
+*   **storage:** cloudflare r2 (avatars)
+*   **deployment:** cloudflare workers (via [opennext](https://opennext.js.org/))
 
-## Features
+## features
 
-*   **Live Leaderboard:** Real-time ranking updates with smooth animations.
-*   **Admin Dashboard:** Mobile-friendly interface to manage players and record matches.
-*   **Match Tracking:** Record match results for Padel, Tennis, and Badminton.
-*   **Edge Performance:** Fully deployed on Cloudflare's global network for low latency.
+*   **live leaderboard:** real-time ranking updates with smooth animations.
+*   **admin dashboard:** mobile-friendly interface to manage players and record matches.
+*   **match tracking:** record match results for padel, tennis, and badminton.
+*   **edge performance:** fully deployed on cloudflare's global network.
 
-## Getting Started
+## getting started
 
-1.  **Install dependencies:**
+1.  **install dependencies:**
     ```bash
     npm install
     ```
 
-2.  **Run development server:**
+2.  **run development server:**
     ```bash
     npm run dev
     ```
 
-3.  **Deploy to Cloudflare:**
+3.  **deploy to cloudflare:**
     ```bash
-    npm run deploy      # Frontend
-    npm run deploy:api  # Backend API
+    npm run deploy      # frontend
+    npm run deploy:api  # backend api
     ```
 
-## Project Structure
+## project structure
 
-*   `src/` - Next.js frontend application.
-*   `api/` - Cloudflare Worker API & Database schema.
-*   `drizzle/` - Database migrations.
-
-## Security
-
-The `/admin` routes are designed to be protected by **Cloudflare Access** (Zero Trust), offloading authentication to the edge.
+*   `src/` - next.js frontend application.
+*   `api/` - cloudflare worker api & database schema.
+*   `drizzle/` - database migrations.

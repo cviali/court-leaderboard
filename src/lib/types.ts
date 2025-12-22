@@ -23,3 +23,12 @@ export interface Court {
   name: string;
   type: "padel" | "tennis" | "badminton";
 }
+
+export interface Event {
+  id: number;
+  name: string;
+  startDateTime: string;
+  endDateTime: string;
+  organizer: string;
+  createdAt: string;
+}

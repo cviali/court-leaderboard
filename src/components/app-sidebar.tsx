@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { LayoutDashboard, Users, Trophy } from "lucide-react";
+import { LayoutDashboard, Users, Trophy, Calendar } from "lucide-react";
 import Image from "next/image";
 
 import { NavMain } from "@/components/nav-main";
@@ -27,6 +27,11 @@ const data = {
       title: "Matches",
       url: "/admin/matches",
       icon: Trophy,
+    },
+    {
+      title: "Events",
+      url: "/admin/events",
+      icon: Calendar,
     },
   ],
 };

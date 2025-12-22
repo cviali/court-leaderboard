@@ -3,19 +3,13 @@ import { PageTransition } from "@/components/page-transition";
 import { Player, Court } from "@/lib/types";
 
 async function getLeaderboardData() {
-  const [playersRes, courtsRes] = await Promise.all([
-    fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://court-leaderboard-api.christian-d59.workers.dev"}/players`, {
-      next: { tags: ["leaderboard"] },
-    }),
-    fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://court-leaderboard-api.christian-d59.workers.dev"}/courts`, {
-      next: { tags: ["leaderboard"] },
-    }),
-  ]);
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://court-leaderboard-api.christian-d59.workers.dev"}/leaderboard`, {
+    next: { tags: ["leaderboard"] },
+  });
 
-  const players = (await playersRes.json()) as Player[];
-  const courts = (await courtsRes.json()) as Court[];
+  const data = (await res.json()) as { players: Player[]; courts: Court[] };
 
-  return { players, courts };
+  return { players: data.players, courts: data.courts };
 }
 
 export default async function Home() {

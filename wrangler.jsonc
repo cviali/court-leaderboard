@@ -45,8 +45,7 @@
 	"r2_buckets": [
 		{
 			"bucket_name": "court-leaderboard-assets",
-			"binding": "court_leaderboard_assets",
-			"remote": true
+			"binding": "court_leaderboard_assets"
 		}
 	]
 	/**

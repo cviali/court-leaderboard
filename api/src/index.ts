@@ -1,7 +1,7 @@
 import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
 import * as schema from "./schema";
-import { players, matches, courts } from "./schema";
-import { eq, sql, desc } from "drizzle-orm";
+import { players, matches, courts, events } from "./schema";
+import { eq, sql, desc, like, asc, gt, gte, lt, lte, and, or } from "drizzle-orm";
 import { Router, IRequest } from "itty-router";
 import type { D1Database, R2Bucket } from "@cloudflare/workers-types";
 
@@ -56,9 +56,20 @@ router.get("/players", withDB, async (request: IRequest, env: Env) => {
   const url = new URL(request.url);
   const page = parseInt(url.searchParams.get("page") || "1");
   const limit = parseInt(url.searchParams.get("limit") || "1000"); // Default high limit for backward compatibility
+  const search = url.searchParams.get("search");
   const offset = (page - 1) * limit;
 
+  // If search is present, use like operator, otherwise undefined (which means no where clause)
+  // Note: Drizzle's findMany 'where' expects a SQL condition or undefined.
+  // If we pass undefined, it returns all records.
+  // We should use `sql` to force case-insensitive search if needed, or ensure input is handled.
+  // However, standard SQL `LIKE` is often case-insensitive. Let's try explicit SQL for safety.
+  const whereClause = search && search.trim() !== "" 
+    ? sql`lower(${players.name}) LIKE lower(${`%${search}%`})` 
+    : undefined;
+
   const playersList = await db.query.players.findMany({
+    where: whereClause,
     orderBy: (players: any) => [desc(players.points)],
     limit: limit,
     offset: offset,
@@ -246,6 +257,68 @@ router.post("/matches", withDB, async (request: IRequest, env: Env) => {
       "Content-Type": "application/json",
     },
     status: 201,
+  });
+});
+
+router.get("/events", withDB, async (request: IRequest, env: Env) => {
+  const req = request as CustomRequest;
+  const db = req.db;
+  const now = new Date();
+
+  const allEvents = await db.select().from(events).all();
+
+  const activeEvents = allEvents.filter(e => e.startDateTime <= now && e.endDateTime >= now);
+  const upcomingEvents = allEvents.filter(e => e.startDateTime > now);
+  
+  activeEvents.sort((a, b) => a.startDateTime.getTime() - b.startDateTime.getTime());
+  upcomingEvents.sort((a, b) => a.startDateTime.getTime() - b.startDateTime.getTime());
+  
+  return new Response(JSON.stringify([...activeEvents, ...upcomingEvents]), {
+    headers: {
+      ...req.corsHeaders,
+      "Content-Type": "application/json",
+    },
+  });
+});
+
+router.post("/events", withDB, async (request: IRequest, env: Env) => {
+  const req = request as CustomRequest;
+  const db = req.db;
+  const { name, startDateTime, endDateTime, organizer } = await request.json() as any;
+
+  const newEvent = await db.insert(events).values({
+    name,
+    startDateTime: new Date(startDateTime),
+    endDateTime: new Date(endDateTime),
+    organizer,
+    createdAt: new Date(),
+  }).returning();
+
+  return new Response(JSON.stringify(newEvent[0]), {
+    headers: {
+      ...req.corsHeaders,
+      "Content-Type": "application/json",
+    },
+    status: 201,
+  });
+});
+
+router.get("/leaderboard", withDB, async (request: IRequest, env: Env) => {
+  const req = request as CustomRequest;
+  const db = req.db;
+
+  const [allPlayers, allCourts] = await Promise.all([
+    db.query.players.findMany({
+      orderBy: (players: any) => [desc(players.points)],
+    }),
+    db.select().from(courts),
+  ]);
+
+  return new Response(JSON.stringify({ players: allPlayers, courts: allCourts }), {
+    headers: {
+      ...req.corsHeaders,
+      "Content-Type": "application/json",
+    },
   });
 });
 

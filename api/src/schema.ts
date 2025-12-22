@@ -31,3 +31,12 @@ export const matches = sqliteTable("matches", {
     .references(() => courts.id),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 });
+
+export const events = sqliteTable("events", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull(),
+  startDateTime: integer("start_date_time", { mode: "timestamp" }).notNull(),
+  endDateTime: integer("end_date_time", { mode: "timestamp" }).notNull(),
+  organizer: text("organizer").notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+});

@@ -31,7 +31,7 @@ export function Leaderboard({ initialPlayers, initialCourts }: LeaderboardProps)
   const router = useRouter();
   const [players, setPlayers] = useState<Player[]>(initialPlayers);
   const [courts, setCourts] = useState<Court[]>(initialCourts);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(new Date());
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   useEffect(() => {
     setPlayers(initialPlayers);

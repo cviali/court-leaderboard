@@ -1,9 +1,10 @@
 import { Leaderboard } from "./leaderboard";
 import { PageTransition } from "@/components/page-transition";
 import { Player, Court } from "@/lib/types";
+import { API_URL } from "@/lib/constants";
 
 async function getLeaderboardData() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://court-leaderboard-api.christian-d59.workers.dev"}/leaderboard`, {
+  const res = await fetch(`${API_URL}/leaderboard`, {
     next: { tags: ["leaderboard"] },
   });
 

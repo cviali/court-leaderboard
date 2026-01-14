@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Player } from "@/lib/types";
 import { ImageUpload } from "@/components/image-upload";
+import { API_URL } from "@/lib/constants";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -46,7 +47,7 @@ export function EditPlayerForm({ player, onSuccess }: EditPlayerFormProps) {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const response = await fetch(`/api/players/${player.id}`, {
+      const response = await fetch(`${API_URL}/players/${player.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

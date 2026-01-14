@@ -5,14 +5,6 @@ const nextConfig: NextConfig = {
 	images: {
 		unoptimized: true,
 	},
-	async rewrites() {
-		return [
-			{
-				source: "/api/:path*",
-				destination: "https://court-leaderboard-api.christian-d59.workers.dev/:path*",
-			},
-		];
-	},
 };
 
 export default nextConfig;

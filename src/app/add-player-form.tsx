@@ -6,6 +6,7 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { useState } from "react";
 import { revalidateLeaderboard } from "./actions";
+import { API_URL } from "@/lib/constants";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -48,7 +49,7 @@ export function AddPlayerForm({ onSuccess, className }: AddPlayerFormProps) {
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     setIsLoading(true);
     try {
-      const response = await fetch("/api/players", {
+      const response = await fetch(`${API_URL}/players`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

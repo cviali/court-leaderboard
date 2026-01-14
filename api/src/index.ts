@@ -113,7 +113,7 @@ router.post("/players", withDB, async (request: IRequest, env: Env) => {
 
     // Construct the public URL (assuming you have a custom domain or use the worker as a proxy)
     // For now, we'll store the R2 key and serve it via a new endpoint
-    finalAvatarUrl = `/api/assets/${fileName}`;
+    finalAvatarUrl = `/assets/${fileName}`;
   }
 
   const newPlayer = await db.insert(players).values({ name, avatarUrl: finalAvatarUrl, instagramHandle }).returning();
@@ -159,7 +159,7 @@ router.put("/players/:id", withDB, async (request: IRequest, env: Env) => {
         httpMetadata: { contentType: "image/jpeg" },
       });
 
-      updateData.avatarUrl = `/api/assets/${fileName}`;
+      updateData.avatarUrl = `/assets/${fileName}`;
     } else if (avatarUrl === "" || avatarUrl === null) {
       updateData.avatarUrl = null;
     } else {
@@ -334,11 +334,11 @@ router.get("/assets/*", async (request: IRequest, env: Env) => {
   }
 
   const headers = new Headers();
-  object.writeHttpMetadata(headers);
+  object.writeHttpMetadata(headers as any);
   headers.set("etag", object.httpEtag);
 
-  return new Response(object.body, {
-    headers,
+  return new Response(object.body as any, {
+    headers: headers as any,
   });
 });
 

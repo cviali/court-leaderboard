@@ -2,6 +2,14 @@
 	"$schema": "https://json.schemastore.org/wrangler.json",
 	"name": "court-leaderboard-api",
 	"main": "src/index.ts",
+	"workers_dev": false,
+	"preview_urls": false,
+	"routes": [
+		{
+			"pattern": "board-api.vlocityarena.com",
+			"custom_domain": true
+		}
+	],
 	"compatibility_date": "2025-12-01",
 	"d1_databases": [
 		{

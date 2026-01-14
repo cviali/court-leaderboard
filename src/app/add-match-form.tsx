@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useEffect, useState, useRef } from "react";
 import { Player, Court } from "@/lib/types";
-import { sports } from "@/lib/constants";
+import { sports, API_URL } from "@/lib/constants";
 import { toast } from "sonner";
 import { revalidateLeaderboard } from "./actions";
 import { Search, Check, ChevronsUpDown } from "lucide-react";
@@ -83,8 +83,8 @@ function PlayerSearchSelect({
         // Only fetch if open is true. If query is empty, we might want to fetch recent or top players.
         // But if query is present, we definitely want to search.
         const url = query 
-          ? `/api/players?search=${encodedQuery}&limit=10`
-          : `/api/players?limit=10`; // Fetch top 10 if no query
+          ? `${API_URL}/players?search=${encodedQuery}&limit=10`
+          : `${API_URL}/players?limit=10`; // Fetch top 10 if no query
 
         fetch(url)
           .then((res) => res.json())
@@ -167,7 +167,7 @@ export function AddMatchForm({ onSuccess, className }: AddMatchFormProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    fetch("/api/courts")
+    fetch(`${API_URL}/courts`)
       .then((res) => res.json())
       .then((data) => setCourts(data as Court[]));
   }, []);
@@ -199,7 +199,7 @@ export function AddMatchForm({ onSuccess, className }: AddMatchFormProps) {
 
     setIsLoading(true);
     try {
-      const response = await fetch("/api/matches", {
+      const response = await fetch(`${API_URL}/matches`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

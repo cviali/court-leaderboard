@@ -5,6 +5,7 @@ import { Match, Player, Court } from "@/lib/types";
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/ui/data-table";
 import { Skeleton } from "@/components/ui/skeleton";
+import { API_URL } from "@/lib/constants";
 
 type MatchWithNames = Match & {
   winnerName: string;
@@ -81,8 +82,8 @@ export function MatchList() {
     // Fetch metadata only once
     if (playersMap.size === 0 || courtsMap.size === 0) {
       const [playersData, courtsData] = await Promise.all([
-        fetch("/api/players").then((res) => res.json()),
-        fetch("/api/courts").then((res) => res.json()),
+        fetch(`${API_URL}/players`).then((res) => res.json()),
+        fetch(`${API_URL}/courts`).then((res) => res.json()),
       ]);
       
       const pMap = new Map((playersData as Player[]).map((p) => [p.id, p.name]));
@@ -99,7 +100,7 @@ export function MatchList() {
   };
 
   const fetchMatchesData = (pageNum: number, limit: number, pMap: Map<number, string>, cMap: Map<number, string>, reset: boolean) => {
-    fetch(`/api/matches?page=${pageNum}&limit=${limit}`)
+    fetch(`${API_URL}/matches?page=${pageNum}&limit=${limit}`)
       .then((res) => res.json())
       .then((data) => {
         const matchesData = data as Match[];

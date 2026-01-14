@@ -10,6 +10,7 @@ import { motion, AnimatePresence, useSpring, useTransform } from "framer-motion"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { EventList } from "./event-list";
+import { getImageUrl } from "@/lib/constants";
 
 function AnimatedNumber({ value }: { value: number }) {
   const spring = useSpring(value, { mass: 0.8, stiffness: 75, damping: 15 });
@@ -136,7 +137,7 @@ export function Leaderboard({ initialPlayers, initialCourts }: LeaderboardProps)
                         rank === 3 ? "border-amber-600 w-11 h-11" :
                         "border-transparent w-10 h-10"
                       )}>
-                        <AvatarImage src={player.avatarUrl || undefined} alt={player.name} />
+                        <AvatarImage src={getImageUrl(player.avatarUrl)} alt={player.name} />
                         <AvatarFallback className="font-bold text-[#32574C] text-sm">
                           {player.name.substring(0, 2).toUpperCase()}
                         </AvatarFallback>

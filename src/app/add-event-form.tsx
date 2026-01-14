@@ -24,6 +24,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { API_URL } from "@/lib/constants";
 
 const FormSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -58,7 +59,7 @@ export function AddEventForm({ onSuccess, className }: AddEventFormProps) {
         endDateTime: data.endDateTime.toISOString(),
       };
 
-      const response = await fetch("/api/events", {
+      const response = await fetch(`${API_URL}/events`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { User } from "lucide-react";
 import { format, isSameDay } from "date-fns";
 import { cn } from "@/lib/utils";
+import { API_URL } from "@/lib/constants";
 
 export function EventList({ mode = "full" }: { mode?: "full" | "compact" }) {
   const [events, setEvents] = useState<Event[]>([]);
@@ -16,7 +17,7 @@ export function EventList({ mode = "full" }: { mode?: "full" | "compact" }) {
 
   const fetchEvents = () => {
     setIsLoading(true);
-    fetch("/api/events")
+    fetch(`${API_URL}/events`)
       .then((res) => res.json())
       .then((data) => {
         // Sort events by start date

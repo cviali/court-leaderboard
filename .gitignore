@@ -1,8 +1,8 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
+node_modules
 /node_modules
-/.pnp
+api/node_modules
+.pnp
 .pnp.*
 .yarn/*
 !.yarn/patches
@@ -16,13 +16,26 @@
 # next.js
 /.next/
 /out/
+next-env.d.ts
 
 # production
 /build
+dist
+
+# OpenNext
+/.open-next
+
+# wrangler / cloudflare
+.wrangler/
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
 
 # misc
 .DS_Store
 *.pem
+*.tsbuildinfo
+.vscode/
 
 # debug
 npm-debug.log*
@@ -30,24 +43,17 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# env files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env*.local
 !.env.example
+
+# drizzle metadata (sometimes kept, but common to ignore meta if not needed for versioning)
+# api/drizzle/meta
 
 # vercel
 .vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
-# OpenNext
-/.open-next
-
-# wrangler files
-.wrangler
-.dev.vars*
-
-
-!.dev.vars.example
-/api/node_modules

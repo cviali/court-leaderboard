@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { X, Image as ImageIcon } from "lucide-react";
 import Image from "next/image";
+import { getImageUrl } from "@/lib/constants";
 
 interface ImageUploadProps {
   value?: string | null;
@@ -82,7 +83,7 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
         {value ? (
           <>
             <Image
-              src={value}
+              src={getImageUrl(value) || ""}
               alt="Avatar"
               fill
               className="object-cover"

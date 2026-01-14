@@ -35,7 +35,7 @@ simple leaderboard app to track rankings and matches.
 3.  **deploy to cloudflare:**
     ```bash
     npm run deploy      # frontend
-    npm run deploy:api  # backend api
+    npm run deploy-api  # backend api
     ```
 
 ## project structure

@@ -17,6 +17,7 @@ import {
 import { ResponsiveSheet } from "@/components/responsive-sheet";
 import { EditPlayerForm } from "./edit-player-form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { API_URL, getImageUrl } from "@/lib/constants";
 
 export function PlayerList() {
   const [players, setPlayers] = useState<Player[]>([]);
@@ -29,7 +30,7 @@ export function PlayerList() {
 
   const fetchPlayers = (pageNum: number, reset = pageNum === 1) => {
     setIsLoading(true);
-    fetch(`/api/players?page=${pageNum}&limit=${LIMIT}`)
+    fetch(`${API_URL}/players?page=${pageNum}&limit=${LIMIT}`)
       .then((res) => res.json())
       .then((resData) => {
         const data = resData as Player[];
@@ -66,7 +67,7 @@ export function PlayerList() {
         return (
           <div className="flex items-center gap-2">
             <Avatar className="h-8 w-8">
-              <AvatarImage src={player.avatarUrl || undefined} alt={player.name} />
+              <AvatarImage src={getImageUrl(player.avatarUrl)} alt={player.name} />
               <AvatarFallback>{player.name.substring(0, 2).toUpperCase()}</AvatarFallback>
             </Avatar>
             <span>{player.name}</span>
@@ -172,7 +173,7 @@ export function PlayerList() {
             }}
           >
             <Avatar className="h-12 w-12">
-              <AvatarImage src={player.avatarUrl || undefined} alt={player.name} />
+              <AvatarImage src={getImageUrl(player.avatarUrl)} alt={player.name} />
               <AvatarFallback>{player.name.substring(0, 2).toUpperCase()}</AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">

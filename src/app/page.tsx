@@ -19,7 +19,7 @@ export default async function Home() {
   return (
     <PageTransition>
       <div className="min-h-screen bg-[#EFE9E4]">
-        <main className="container mx-auto p-4">
+        <main className="w-full">
           <Leaderboard initialPlayers={players} initialCourts={courts} />
         </main>
       </div>

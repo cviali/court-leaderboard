@@ -34,7 +34,7 @@ const withDB = (request: IRequest, env: Env) => {
   req.db = drizzle(env.DB, { schema });
   req.corsHeaders = {
     "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
   };
 };
@@ -44,7 +44,7 @@ router.options("*", (request: IRequest) => {
   return new Response(null, {
     headers: {
       "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type",
     },
   });
@@ -81,6 +81,30 @@ router.get("/players", withDB, async (request: IRequest, env: Env) => {
   // the "infinite scroll" logic by appending data.
   
   return new Response(JSON.stringify(playersList), {
+    headers: {
+      ...req.corsHeaders,
+      "Content-Type": "application/json",
+    },
+  });
+});
+
+router.get("/players/:id", withDB, async (request: IRequest, env: Env) => {
+  const req = request as CustomRequest;
+  const db = req.db;
+  const id = parseInt(request.params.id);
+
+  const player = await db.query.players.findFirst({
+    where: eq(players.id, id),
+  });
+
+  if (!player) {
+    return new Response("Player not found", {
+      status: 404,
+      headers: req.corsHeaders,
+    });
+  }
+
+  return new Response(JSON.stringify(player), {
     headers: {
       ...req.corsHeaders,
       "Content-Type": "application/json",
@@ -336,9 +360,22 @@ router.get("/assets/*", async (request: IRequest, env: Env) => {
   const headers = new Headers();
   object.writeHttpMetadata(headers as any);
   headers.set("etag", object.httpEtag);
+  headers.set("Access-Control-Allow-Origin", "*");
 
   return new Response(object.body as any, {
     headers: headers as any,
+  });
+});
+
+// 404 handler
+router.all("*", () => {
+  return new Response("Not Found", {
+    status: 404,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    },
   });
 });
 
@@ -348,7 +385,17 @@ export default {
     env: Env,
     ctx: ExecutionContext
   ): Promise<Response> {
-    return router.handle(request, env, ctx).catch(
+    return router.handle(request, env, ctx).then((response) => {
+      if (response) return response;
+      
+      // Fallback 404 if router.handle somehow returns undefined
+      return new Response("Not Found", {
+        status: 404,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+      });
+    }).catch(
       (err) =>
         new Response(err.stack, {
           status: 500,

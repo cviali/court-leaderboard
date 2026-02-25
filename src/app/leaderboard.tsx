@@ -66,7 +66,7 @@ export function Leaderboard({ initialPlayers, initialCourts }: LeaderboardProps)
 
   return (
     <div 
-      className="w-full max-w-7xl mx-auto space-y-4 p-4"
+      className="w-full space-y-4 p-4"
       onClick={enableFullscreen}
     >
       <div className="flex flex-col items-center mb-4">
@@ -86,9 +86,9 @@ export function Leaderboard({ initialPlayers, initialCourts }: LeaderboardProps)
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-3 gap-6">
         {/* Leaderboard Column */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="col-span-2 space-y-4">
           <h2 className="text-2xl font-bold text-[#32574C]">Top Players</h2>
           <div className="flex flex-col gap-2">
             <AnimatePresence mode="popLayout">
